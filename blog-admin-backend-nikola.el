@@ -56,8 +56,8 @@
   "Return the value for a file to be cached.
 Currently returns '(filename modification-time)"
   (lambda (file-attributes)
-    (list (car file-attributes)
-          (nth 5 file-attributes))))
+    (list  (car file-attributes)
+          (nth 5 file-attributes))) )
 
 (defun -get-posts-dir-cache-value ()
   "Return list of (file modification-time) values without . & .."
@@ -70,7 +70,8 @@ Currently returns '(filename modification-time)"
 (defun -posts-dir-changed ()
   "Return true if any post has changed"
   (let* ((-posts-dir-cache-new (-get-posts-dir-cache-value))
-         (changed (not (equal -posts-dir-cache -posts-dir-cache-new))))
+         (changed nil))
+    (setq changed (not (equal -posts-dir-cache -posts-dir-cache-new)))
     (setq -posts-dir-cache -posts-dir-cache-new)
     changed))
 
@@ -83,10 +84,12 @@ Currently returns '(filename modification-time)"
                      "cd %s && %s status -Psd"
                      blog-admin-backend-path
                      blog-admin-backend-nikola-executable))
+           ;; (message command)
            (output-buffer-name "*blog-admin-backend-nikola-output*")
            (output (shell-command command output-buffer-name output-buffer-name))
            draft-paths published-paths scheduled-paths)
       (message "Scanning posts... Done!")
+
       (with-current-buffer output-buffer-name
         (setq draft-paths (mapcar #'-find-source (-find-lines "Draft"))
               published-paths (mapcar #'-find-source (-find-lines "Published"))
@@ -153,6 +156,7 @@ Currently returns '(filename modification-time)"
                    blog-admin-backend-nikola-executable
                    flag
                    post)))
+    (message command)
     (shell-command command)))
 
 (defun -publish-or-unpublish ()
